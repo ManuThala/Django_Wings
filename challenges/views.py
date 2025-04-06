@@ -1,5 +1,5 @@
 from django.shortcuts import render;
-from django.http import HttpResponse,HttpResponseNotFound,HttpResponseRedirect;
+from django.http import Http404,HttpResponseNotFound,HttpResponseRedirect;
 from django.urls import reverse
 
 monthly_challenges={
@@ -14,23 +14,15 @@ monthly_challenges={
     'september':'Work for September',
     'october':'Work for October',
     'november':'Work for November',
-    'december':'Work for December'
+    'december':None
 }
 
 def index(request):
-    list_months='';
-    months=list(monthly_challenges.keys());
-    for month in months:
-        month_cap=month.capitalize();
-        month_path=reverse('monthly-challenge',args=[month])
-        list_months+=f'<li><a href=\'{month_path}\'>{month_cap}</a></li>' 
-    response_data=f'<ul>{list_months}</ul>'
-    return HttpResponse(response_data);
+    months=list(monthly_challenges.keys()); 
+    return render(request,'challenges/index.html',{'months':months});
     
 
-
-
-
+    
 # create views here
 def monthly_challenge_number(request,month):
     months=list(monthly_challenges.keys());
@@ -45,8 +37,8 @@ def monthly_challenge_number(request,month):
 def monthly_challenge(request,month):
     try:
         challenge_text=monthly_challenges[month]
-        response_data=f'<h1>{challenge_text}</h1>'
-        return HttpResponse(response_data);
+        # response_data=render_to_string('challenges/challenge.html')
+        return render(request, 'challenges/challenge.html',{'text':challenge_text,'month_name':month});
     except:
-        return HttpResponseNotFound('Invalid month')
+        raise Http404('This month is not supported!');
     
